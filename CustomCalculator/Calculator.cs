@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CustomCalculator
 {
@@ -33,6 +34,9 @@ namespace CustomCalculator
                     {
                         int value;
                         int.TryParse(t.Value, out value);
+
+                        if (value < 0)
+                            throw new Exception("Invalid operand literal:  Negative value not allowed");
 
                         if(value <= 1000)
                             stack.Push(t);

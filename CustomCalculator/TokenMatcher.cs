@@ -22,12 +22,23 @@ namespace CustomCalculator
         {
             string line = command;
 
-            if (command.StartsWith("//"))
+            if (command.StartsWith("//["))
+            {
+                int end = command.IndexOf("\\n");
+                string custom = command.Substring(3, end - 4);
+                line = command.Substring(end + 4);
+
+                patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, custom));
+            }
+            else if (command.StartsWith("//"))
             {
                 int end = command.IndexOf("\\n");
                 string custom = command.Substring(2, end - 2);
                 line = command.Substring(end + 4);
+
+                patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, custom));
             }
+
 
             return line;
         }
