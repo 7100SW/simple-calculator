@@ -2,7 +2,7 @@
   "profiles": {
     "CustomCalculator": {
       "commandName": "Project",
-      "commandLineArgs": "\"//[;;;]\\n1,20,abc;;;4\""
+      "commandLineArgs": "\"//[*][#][@]\\n1,20,abc;;;4\""
     }
   }
 }

@@ -1,44 +1,51 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace CustomCalculator
 {
     public class TokenMatcher
     {
-        private readonly List<TokenPattern> patterns;
+        public List<TokenPattern> Patterns { get; set; } = new List<TokenPattern>();
 
         public TokenMatcher()
         {
-            patterns = new List<TokenPattern>();
-
-            patterns.Add(new DelimiterTokenPattern(TokenType.Literal, "*"));
-            patterns.Add(new DelimiterTokenPattern(TokenType.AddOperator, "+"));
-            patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, ","));
-            patterns.Add(new NewLineTokenPattern());
-            patterns.Add(new LiteralTokenPattern());
+            Patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, ","));
+            Patterns.Add(new NewLineTokenPattern());
+            Patterns.Add(new LiteralTokenPattern());
         }
 
 
-        public string SetupCustomDelimiters(string command)
+        /// <summary>
+        /// Extract custom delimiter syntax and return the remaining commands
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns>Command Line without Custom Delimeter</returns>
+        public string ExtractCustomDelimiters(string command)
         {
             string line = command;
 
             if (command.StartsWith("//["))
             {
-                int end = command.IndexOf("\\n");
-                string custom = command.Substring(3, end - 4);
-                line = command.Substring(end + 4);
+                bool match = Regex.IsMatch(command, @"\/\/(\[(.+)])*?\\n");
+                var collection = Regex.Matches(command, @"(?<=\[).+?(?=\])");
+                foreach(Match c in collection)
+                {
+                    Patterns.Add(new DelimiterTokenPattern(TokenType.CustomDelimiter, c.Value));
+                }
 
-                patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, custom));
+                int end = command.IndexOf("\n");
+                string custom = command.Substring(2, end - 2);
+                line = command.Substring(end + 1);
+
             }
             else if (command.StartsWith("//"))
             {
-                int end = command.IndexOf("\\n");
+                int end = command.IndexOf("\n");
                 string custom = command.Substring(2, end - 2);
-                line = command.Substring(end + 4);
+                line = command.Substring(end + 1);
 
-                patterns.Add(new DelimiterTokenPattern(TokenType.CommaDelimiter, custom));
+                Patterns.Add(new DelimiterTokenPattern(TokenType.CustomDelimiter, custom));
             }
-
 
             return line;
         }
@@ -52,7 +59,7 @@ namespace CustomCalculator
         {
             TokenPattern result = null;
 
-            foreach (var pattern in patterns)
+            foreach (var pattern in Patterns)
             {
                 if (pattern.IsMatch(line))
                 {

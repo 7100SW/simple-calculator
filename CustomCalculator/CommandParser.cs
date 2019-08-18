@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace CustomCalculator
 {
-    public class CommandParser
+
+    public class CommandParser : ICommandParser
     {
         private readonly TokenMatcher _tokenMatcher;
         private string _lineBuffer;
@@ -15,7 +16,7 @@ namespace CustomCalculator
 
         public void Initialize(string line)
         {
-            _lineBuffer = _tokenMatcher.SetupCustomDelimiters(line);
+            _lineBuffer = _tokenMatcher.ExtractCustomDelimiters(line);
         }
 
         public IList<Token> Tokenize()
@@ -32,6 +33,10 @@ namespace CustomCalculator
 
                     tokens.Add(t);
                     Console.WriteLine(temp);
+                }
+                else
+                {
+                    throw new Exception("Syntax error: Unrecognized pattern");
                 }
             }
 
